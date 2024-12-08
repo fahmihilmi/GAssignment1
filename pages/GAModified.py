@@ -5,13 +5,22 @@ from numpy import cos
 from numpy import e
 from numpy import pi
 from numpy import meshgrid
-#from matplotlib import pyplot
+from matplotlib import pyplot
 from streamlit import st
 from mpl_toolkits.mplot3d import Axes3D
 
-import streamlit as st
 import random
 import time
+
+pip install streamlit numpy matplotlib
+
+# Create a new virtual environment (if needed)
+python -m venv myenv
+source myenv/bin/activate  # On Windows, use `myenv\Scripts\activate`
+
+# Install required libraries
+pip install streamlit numpy matplotlib
+
 
 st.set_page_config(
     page_title="Genetic Algorithm"
