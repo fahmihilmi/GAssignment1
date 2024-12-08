@@ -69,6 +69,23 @@ def crossover(selected_chromo, CHROMO_LEN, population):
     offspring_cross.extend([child])
   return offspring_cross
 
+# Inside your Streamlit form:
+
+with st.form("my_form"):
+    TARGET = st.text_input("Enter your name")
+    
+    # Crossover Rate Input (CO_R)
+    CO_R = st.slider("Crossover Rate (CO_R)", min_value=0.0, max_value=0.95, value=0.8, step=0.01)
+    
+    # Mutation Rate Input (MUT_R)
+    MUT_RATE = st.slider("Mutation Rate (MUT_R)", min_value=0.01, max_value=0.05, value=0.2, step=0.01)
+    
+    calculate = st.form_submit_button("Calculate")
+
+    if calculate:
+        main(POP_SIZE, MUT_RATE, TARGET, GENES, CO_R)
+
+
 #mutation
 
 def mutate(offspring, MUT_RATE):
@@ -80,6 +97,23 @@ def mutate(offspring, MUT_RATE):
               arr[i] = random.choice(GENES)
       mutated_offspring.append(arr)
   return mutated_offspring
+
+# Inside your Streamlit form:
+
+with st.form("my_form"):
+    TARGET = st.text_input("Enter your name")
+    
+    # Crossover Rate Input (CO_R)
+    CO_R = st.slider("Crossover Rate (CO_R)", min_value=0.0, max_value=0.95, value=0.8, step=0.01)
+    
+    # Mutation Rate Input (MUT_R)
+    MUT_RATE = st.slider("Mutation Rate (MUT_R)", min_value=0.01, max_value=0.05, value=0.2, step=0.01)
+    
+    calculate = st.form_submit_button("Calculate")
+
+    if calculate:
+        main(POP_SIZE, MUT_RATE, TARGET, GENES)
+
 
 #replacement
 
