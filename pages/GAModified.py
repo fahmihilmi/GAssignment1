@@ -12,16 +12,6 @@ from mpl_toolkits.mplot3d import Axes3D
 import random
 import time
 
-pip install streamlit numpy matplotlib
-
-# Create a new virtual environment (if needed)
-python -m venv myenv
-source myenv/bin/activate  # On Windows, use `myenv\Scripts\activate`
-
-# Install required libraries
-pip install streamlit numpy matplotlib
-
-
 st.set_page_config(
     page_title="Genetic Algorithm"
 )
