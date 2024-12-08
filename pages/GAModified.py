@@ -5,7 +5,7 @@ from numpy import cos
 from numpy import e
 from numpy import pi
 from numpy import meshgrid
-from matplotlib import pyplot
+#from matplotlib import pyplot
 from streamlit import st
 from mpl_toolkits.mplot3d import Axes3D
 
