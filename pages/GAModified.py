@@ -1,14 +1,4 @@
-from numpy import arange
-from numpy import exp
-from numpy import sqrt
-from numpy import cos
-from numpy import e
-from numpy import pi
-from numpy import meshgrid
-from matplotlib import pyplot
-from streamlit import st
-from mpl_toolkits.mplot3d import Axes3D
-
+import streamlit as st
 import random
 import time
 
