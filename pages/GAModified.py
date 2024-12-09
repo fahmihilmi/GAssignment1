@@ -1,23 +1,21 @@
 import streamlit as st
 import random
 import time
+import pandas as pd
 
 ##################################################################UPLOAD CSV FILE######################################
 
-import streamlit as st
-import pandas as pd
-
 # URL to the raw CSV file on GitHub (replace with your actual URL)
-csv_url = "program_ratings.csv"
+csv = "program_ratings.csv"
 
 # Read the CSV from the URL
 @st.cache
-def load_data(program_ratings.csv):
-    data = pd.read_csv(program_ratings.csv)
+def load_data("program_ratings.csv"):
+    data = pd.read_csv("program_ratings.csv")
     return data
 
 # Load the data
-data = load_data(program_ratings.csv)
+data = load_data("program_ratings.csv")
 
 # Display the data
 st.write("CSV data from GitHub:", data)
