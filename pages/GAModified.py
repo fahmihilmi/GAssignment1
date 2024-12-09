@@ -3,25 +3,6 @@ import random
 import time
 import pandas as pd
 
-##################################################################UPLOAD CSV FILE######################################
-
-# URL to the raw CSV file on GitHub (replace with your actual URL)
-csv = "program_ratings.csv"
-
-# Read the CSV from the URL
-@st.cache
-def load_data("program_ratings.csv"):
-    data = pd.read_csv("program_ratings.csv")
-    return data
-
-# Load the data
-data = load_data("program_ratings.csv")
-
-# Display the data
-st.write("CSV data from GitHub:", data)
-
-##########################################################################################################################
-
 
 st.set_page_config(
     page_title="Genetic Algorithm"
