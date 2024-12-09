@@ -17,7 +17,7 @@ st.set_page_config(
     page_title="Program Ratings"
 )
 
-st.header("Genetic Algorithm", divider="gray")
+st.header("Program Ratings", divider="gray")
 
 #POP_SIZE: Number of Chromosomes in our list.
 POP_SIZE = 500
