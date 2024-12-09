@@ -1,161 +1,97 @@
 import streamlit as st
 import random
-import time
-import pandas as pd
-
-##### UPLOAD CSV FILE #####
-# URL of the raw CSV file in GitHub (replace with your actual URL)
-csv_url = "pages/program_ratings.csv"
-
-# Read the CSV file from the raw URL
-data = pd.read_csv(csv_url)
-
-# Display the data (optional)
-print(data.head())  # Shows the first 5 rows of the CSV
-
-##### PAGE TITLE #####
 
 st.set_page_config(
-    page_title="Program Ratings"
+    page_title="Genetic Algorithm: Scheduling Problem"
 )
 
-st.header("Program Ratings", divider="gray")
+st.header("Genetic Algorithm: Scheduling Problem", divider="gray")
 
-#POP_SIZE: Number of Chromosomes in our list.
-POP_SIZE = 500
-#POP_SIZE = st.number_input("Enter population size")
+# Define constants
+POP_SIZE = 500  # Population size
+GENES = range(10)  # Assume 10 time slots for simplicity
 
-#MUT_RATE: Rate at which our string will be changed.
-#MUT_RATE = 0.2
-
-#TARGET: Our goal.
-#TARGET = 'fakhitah'
-    
-
-#GENES: Options from which our population would be created.
-GENES = ' abcdefghijklmnopqrstuvwxyz'
-
-#initialization
-
-def initialize_pop(TARGET):
-  population = list()
-  tar_len = len(TARGET)
-
-  for i in range(POP_SIZE):
-      temp = list()
-      for j in range(tar_len):
-          temp.append(random.choice(GENES))
-      population.append(temp)
-
-  return population
-
-#fitness calculation
-#0 fitness means target found
-
-def fitness_cal(TARGET, chromo_from_pop):
-  difference = 0
-  for tar_char, chromo_char in zip(TARGET, chromo_from_pop):
-      if tar_char != chromo_char:
-          difference+=1
-  return [chromo_from_pop, difference]
-
-#selection
-#returns top 50% population sorted according to fitness
-
-def selection(population, TARGET):
-  sorted_chromo_pop = sorted(population, key= lambda x: x[1])
-  return sorted_chromo_pop[:int(0.5*POP_SIZE)]
-
-#crossover
-
-def crossover(selected_chromo, CHROMO_LEN, population):
-  offspring_cross = []
-  for i in range(int(POP_SIZE)):
-    parent1 = random.choice(selected_chromo)
-    parent2 = random.choice(population[:int(POP_SIZE*50)])
-
-    p1 = parent1[0]
-    p2 = parent2[0]
-
-    crossover_point = random.randint(1, CHROMO_LEN-1)
-    child =  p1[:crossover_point] + p2[crossover_point:]
-    offspring_cross.extend([child])
-  return offspring_cross
-
-#mutation
-
-def mutate(offspring, MUT_RATE):
-  mutated_offspring = []
-
-  for arr in offspring:
-      for i in range(len(arr)):
-          if random.random() < MUT_RATE:
-              arr[i] = random.choice(GENES)
-      mutated_offspring.append(arr)
-  return mutated_offspring
-
-#replacement
-
-def replace(new_gen, population):
-  for _ in range(len(population)):
-      if population[_][1] > new_gen[_][1]:
-        population[_][0] = new_gen[_][0]
-        population[_][1] = new_gen[_][1]
-  return population
-
-#main
-
-def main(POP_SIZE, MUT_RATE, TARGET, GENES):
-    # 1) initialize population
-    initial_population = initialize_pop(TARGET)
-    found = False
+# Initialization: Random schedules
+def initialize_pop(num_tasks):
     population = []
+    for _ in range(POP_SIZE):
+        schedule = [random.choice(GENES) for _ in range(num_tasks)]
+        population.append(schedule)
+    return population
+
+# Fitness calculation: Minimize conflicts (e.g., tasks in the same time slot)
+def fitness_cal(schedule):
+    conflicts = 0
+    seen = {}
+    for time_slot in schedule:
+        if time_slot in seen:
+            conflicts += 1
+        else:
+            seen[time_slot] = True
+    return conflicts
+
+# Selection: Return top 50% based on fitness
+def selection(population):
+    population.sort(key=lambda x: x[1])  # Sort by fitness
+    return population[:POP_SIZE // 2]
+
+# Crossover: Create offspring by combining two parents
+def crossover(selected, num_tasks):
+    offspring = []
+    for _ in range(POP_SIZE):
+        parent1, parent2 = random.sample(selected, 2)
+        crossover_point = random.randint(1, num_tasks - 1)
+        child = parent1[:crossover_point] + parent2[crossover_point:]
+        offspring.append(child)
+    return offspring
+
+# Mutation: Randomly alter time slots
+def mutate(offspring, mut_rate):
+    for schedule in offspring:
+        for i in range(len(schedule)):
+            if random.random() < mut_rate:
+                schedule[i] = random.choice(GENES)
+    return offspring
+
+# Main Genetic Algorithm
+def main(num_tasks, mut_rate):
+    # 1) Initialize population
+    population = initialize_pop(num_tasks)
+    population = [[schedule, fitness_cal(schedule)] for schedule in population]
     generation = 1
 
-    # 2) Calculating the fitness for the current population
-    for _ in range(len(initial_population)):
-        population.append(fitness_cal(TARGET, initial_population[_]))
+    while True:
+        # 2) Select the best schedules
+        selected = selection(population)
 
-    # now population has 2 things, [chromosome, fitness]
-    # 3) now we loop until TARGET is found
-    while not found:
+        # 3) Perform crossover
+        selected_schedules = [chromosome for chromosome, _ in selected]
+        offspring = crossover(selected_schedules, num_tasks)
 
-      # 3.1) select best people from current population
-      selected = selection(population, TARGET)
+        # 4) Mutate offspring
+        mutated_offspring = mutate(offspring, mut_rate)
 
-      # 3.2) mate parents to make new generation
-      population = sorted(population, key= lambda x:x[1])
-      crossovered = crossover(selected, len(TARGET), population)
+        # 5) Evaluate fitness of offspring
+        new_generation = [[schedule, fitness_cal(schedule)] for schedule in mutated_offspring]
 
-      # 3.3) mutating the children to diversify the new generation
-      mutated = mutate(crossovered, MUT_RATE)
+        # 6) Replace worst individuals in the population
+        population = selection(population + new_generation)
 
-      new_gen = []
-      for _ in mutated:
-          new_gen.append(fitness_cal(TARGET, _))
+        # Check if an optimal solution is found
+        if population[0][1] == 0:
+            st.write(f"Optimal schedule found in generation {generation}")
+            st.write("Schedule:", population[0][0])
+            break
 
-      # 3.4) replacement of bad population with new generation
-      # we sort here first to compare the least fit population with the most fit new_gen
+        # Display progress
+        st.write(f"Generation: {generation}, Best Fitness: {population[0][1]}")
+        generation += 1
 
-      population = replace(new_gen, population)
-
-
-      if (population[0][1] == 0):
-        st.write('Target found')
-        st.write('String: ' + str(population[0][0]) + ' Generation: ' + str(generation) + ' Fitness: ' + str(population[0][1]))
-        break
-      st.write('String: ' + str(population[0][0]) + ' Generation: ' + str(generation) + ' Fitness: ' + str(population[0][1]))
-      generation+=1
-        
-with st.form("my_form"):
-    TARGET = st.text_input("Enter your name")
-    MUT_RATE = st.number_input("Enter your mutation rate")
-
+# Streamlit form for input
+with st.form("scheduler_form"):
+    num_tasks = st.number_input("Number of tasks", min_value=1, value=5)
+    mut_rate = st.number_input("Mutation rate", min_value=0.01, max_value=1.0, value=0.1)
     calculate = st.form_submit_button("Calculate")
 
     if calculate:
-        main(POP_SIZE, MUT_RATE, TARGET, GENES)
-
-
-
-
+        main(num_tasks, mut_rate)
