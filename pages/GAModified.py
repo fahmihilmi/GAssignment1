@@ -3,15 +3,18 @@ import random
 import time
 import pandas as pd
 
-
+##### UPLOAD CSV FILE #####
 # URL of the raw CSV file in GitHub (replace with your actual URL)
 csv_url = "pages/program_ratings.csv"
 
 # Read the CSV file from the raw URL
 data = pd.read_csv(csv_url)
 
-# Display the data (optional)
-print(data.head())  # Shows the first 5 rows of the CSV
+# Show the first few rows of the data
+    st.write("Here is a preview of the uploaded data:")
+    st.dataframe(data.head())  # Display first 5 rows of the DataFrame
+
+##### PAGE TITLE #####
 
 st.set_page_config(
     page_title="Program Ratings"
