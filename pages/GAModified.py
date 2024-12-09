@@ -14,7 +14,7 @@ data = pd.read_csv(csv_url)
 print(data.head())  # Shows the first 5 rows of the CSV
 
 st.set_page_config(
-    page_title="Genetic Algorithm"
+    page_title="Program Ratings"
 )
 
 st.header("Genetic Algorithm", divider="gray")
