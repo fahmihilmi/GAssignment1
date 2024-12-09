@@ -1,6 +1,17 @@
 import streamlit as st
 import random
 import time
+import pandas as pd
+
+
+# URL of the raw CSV file in GitHub (replace with your actual URL)
+csv_url = "https://raw.githubusercontent.com/your-username/your-repository/main/path/to/your-file.csv"
+
+# Read the CSV file from the raw URL
+data = pd.read_csv(csv_url)
+
+# Display the data (optional)
+print(data.head())  # Shows the first 5 rows of the CSV
 
 st.set_page_config(
     page_title="Genetic Algorithm"
