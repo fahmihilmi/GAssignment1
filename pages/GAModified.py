@@ -5,7 +5,7 @@ import pandas as pd
 
 
 # URL of the raw CSV file in GitHub (replace with your actual URL)
-csv_url = "https://raw.githubusercontent.com/your-username/your-repository/main/path/to/your-file.csv"
+csv_url = "pages/program_ratings.csv"
 
 # Read the CSV file from the raw URL
 data = pd.read_csv(csv_url)
