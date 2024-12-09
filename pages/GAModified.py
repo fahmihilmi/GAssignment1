@@ -10,9 +10,8 @@ csv_url = "pages/program_ratings.csv"
 # Read the CSV file from the raw URL
 data = pd.read_csv(csv_url)
 
-# Show the first few rows of the data
-    st.write("Here is a preview of the uploaded data:")
-    st.dataframe(data.head())  # Display first 5 rows of the DataFrame
+# Display the data (optional)
+print(data.head())  # Shows the first 5 rows of the CSV
 
 ##### PAGE TITLE #####
 
