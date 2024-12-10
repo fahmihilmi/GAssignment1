@@ -36,16 +36,13 @@ def selection(population):
     return population[:POP_SIZE // 2]
 
 # Crossover: Create offspring by combining two parents
-def crossover(selected, num_tasks, co_rate):
+def crossover(selected, num_tasks):
     offspring = []
     for _ in range(POP_SIZE):
-        if random.random() < co_rate:
-            parent1, parent2 = random.sample(selected, 2)
-            crossover_point = random.randint(1, num_tasks - 1)
-            child = parent1[:crossover_point] + parent2[crossover_point:]
-            offspring.append(child)
-        else:
-            offspring.append(random.choice(selected))
+        parent1, parent2 = random.sample(selected, 2)
+        crossover_point = random.randint(1, num_tasks - 1)
+        child = parent1[:crossover_point] + parent2[crossover_point:]
+        offspring.append(child)
     return offspring
 
 # Mutation: Randomly alter time slots
@@ -57,7 +54,7 @@ def mutate(offspring, mut_rate):
     return offspring
 
 # Main Genetic Algorithm
-def main(num_tasks, co_rate, mut_rate):
+def main(num_tasks, mut_rate):
     # 1) Initialize population
     population = initialize_pop(num_tasks)
     population = [[schedule, fitness_cal(schedule)] for schedule in population]
@@ -69,7 +66,7 @@ def main(num_tasks, co_rate, mut_rate):
 
         # 3) Perform crossover
         selected_schedules = [chromosome for chromosome, _ in selected]
-        offspring = crossover(selected_schedules, num_tasks, co_rate)
+        offspring = crossover(selected_schedules, num_tasks)
 
         # 4) Mutate offspring
         mutated_offspring = mutate(offspring, mut_rate)
@@ -93,11 +90,8 @@ def main(num_tasks, co_rate, mut_rate):
 # Streamlit form for input
 with st.form("scheduler_form"):
     num_tasks = st.number_input("Number of tasks", min_value=1, value=5)
-    co_rate = st.number_input("Crossover rate (CO_R)", min_value=0.0, max_value=0.95, value=0.8)
-    mut_rate = st.number_input("Mutation rate (MUT_R)", min_value=0.01, max_value=0.05, value=0.2)
+    mut_rate = st.number_input("Mutation rate", min_value=0.01, max_value=1.0, value=0.1)
     calculate = st.form_submit_button("Calculate")
 
     if calculate:
-        main(num_tasks, co_rate, mut_rate)
-
-st.form_submit_button() 
+        main(num_tasks, mut_rate)
