@@ -1,6 +1,7 @@
 import streamlit as st
 import csv
 import random
+import requests
 
 # Page Configuration
 st.set_page_config(
@@ -18,112 +19,56 @@ DEFAULT_MUT_R = 0.2  # Default Mutation rate
 EL_S = 2  # Elitism size
 ALL_TIME_SLOTS = list(range(6, 24))  # Time slots
 
-# CSV Reading Function
-def read_csv_to_dict(file_path):
+# Function to read CSV from GitHub raw URL
+def read_csv_from_github(url):
+    response = requests.get(url)
+    response.raise_for_status()  # Ensure we get a valid response
+    lines = response.text.splitlines()
     program_ratings = {}
-    with open(file_path, mode="r", newline="") as file:
-        reader = csv.reader(file)
+
+    reader = csv.reader(lines)
+    header = next(reader)  # Skip the header
+    for row in reader:
+        program = row[0]
+        ratings = [float(x) for x in row[1:]]  # Convert ratings to floats
+        program_ratings[program] = ratings
+    return program_ratings
+
+# Sidebar for Input
+st.sidebar.header("Upload Data or Enter GitHub URL")
+uploaded_file = st.sidebar.file_uploader("Upload the program ratings CSV file", type=["csv"])
+github_url = st.sidebar.text_input(
+    "Alternatively, enter GitHub raw CSV URL",
+    "https://raw.githubusercontent.com/your_username/your_repo/main/program_ratings.csv"
+)
+
+ratings = {}
+if uploaded_file:
+    def read_csv_to_dict(file_obj):
+        program_ratings = {}
+        reader = csv.reader(file_obj)
         header = next(reader)  # Skip the header
         for row in reader:
             program = row[0]
-            ratings = [float(x) for x in row[1:]]  # Convert ratings to floats
+            ratings = [float(x) for x in row[1:]]
             program_ratings[program] = ratings
-    return program_ratings
+        return program_ratings
 
-# Load Data
-st.sidebar.header("Upload Data")
-uploaded_file = st.sidebar.file_uploader("Upload the program ratings CSV file", type=["csv"])
-ratings = {}
-
-if uploaded_file:
     ratings = read_csv_to_dict(uploaded_file)
     st.sidebar.success("Data uploaded successfully!")
-    all_programs = list(ratings.keys())
+elif github_url:
+    try:
+        ratings = read_csv_from_github(github_url)
+        st.sidebar.success("Data loaded from GitHub successfully!")
+    except Exception as e:
+        st.sidebar.error(f"Error loading data from GitHub: {e}")
+
+# Continue with optimization code...
+all_programs = list(ratings.keys()) if ratings else []
+if not ratings:
+    st.warning("Please provide a CSV file or a valid GitHub URL to proceed.")
 else:
-    st.sidebar.warning("Please upload a CSV file to proceed.")
-    all_programs = []
-
-# Fitness Function
-def fitness_function(schedule):
-    total_rating = 0
-    for time_slot, program in enumerate(schedule):
-        total_rating += ratings[program][time_slot]
-    return total_rating
-
-# Initialize Population
-def initialize_pop(programs, time_slots):
-    if not programs:
-        return [[]]
-
-    all_schedules = []
-    for i in range(len(programs)):
-        for schedule in initialize_pop(programs[:i] + programs[i + 1:], time_slots):
-            all_schedules.append([programs[i]] + schedule)
-
-    return all_schedules
-
-# Finding Best Schedule (Brute Force)
-def finding_best_schedule(all_schedules):
-    best_schedule = []
-    max_ratings = 0
-
-    for schedule in all_schedules:
-        total_ratings = fitness_function(schedule)
-        if total_ratings > max_ratings:
-            max_ratings = total_ratings
-            best_schedule = schedule
-
-    return best_schedule
-
-# Genetic Algorithm
-def genetic_algorithm(initial_schedule, generations=GEN, population_size=POP, crossover_rate=DEFAULT_CO_R, mutation_rate=DEFAULT_MUT_R, elitism_size=EL_S):
-    population = [initial_schedule]
-    for _ in range(population_size - 1):
-        random_schedule = initial_schedule.copy()
-        random.shuffle(random_schedule)
-        population.append(random_schedule)
-
-    for generation in range(generations):
-        new_population = []
-
-        # Elitism
-        population.sort(key=lambda schedule: fitness_function(schedule), reverse=True)
-        new_population.extend(population[:elitism_size])
-
-        while len(new_population) < population_size:
-            parent1, parent2 = random.choices(population, k=2)
-            if random.random() < crossover_rate:
-                child1, child2 = crossover(parent1, parent2)
-            else:
-                child1, child2 = parent1.copy(), parent2.copy()
-
-            if random.random() < mutation_rate:
-                child1 = mutate(child1)
-            if random.random() < mutation_rate:
-                child2 = mutate(child2)
-
-            new_population.extend([child1, child2])
-
-        population = new_population
-
-    return population[0]
-
-# Crossover Function
-def crossover(schedule1, schedule2):
-    crossover_point = random.randint(1, len(schedule1) - 2)
-    child1 = schedule1[:crossover_point] + schedule2[crossover_point:]
-    child2 = schedule2[:crossover_point] + schedule1[crossover_point:]
-    return child1, child2
-
-# Mutation Function
-def mutate(schedule):
-    mutation_point = random.randint(0, len(schedule) - 1)
-    new_program = random.choice(all_programs)
-    schedule[mutation_point] = new_program
-    return schedule
-
-# Main Logic
-if ratings:
+    # Rest of your existing optimization code goes here...
     st.sidebar.header("Parameters")
     GEN = st.sidebar.number_input("Number of Generations", min_value=1, value=100)
     POP = st.sidebar.number_input("Population Size", min_value=2, value=50)
@@ -154,5 +99,3 @@ if ratings:
         st.write(f"Time Slot {ALL_TIME_SLOTS[time_slot]:02d}:00 - Program {program}")
 
     st.write("💯 **Total Ratings:**", fitness_function(final_schedule))
-else:
-    st.warning("Please upload a CSV file to see results.")
