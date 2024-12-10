@@ -99,3 +99,5 @@ with st.form("scheduler_form"):
 
     if calculate:
         main(num_tasks, co_rate, mut_rate)
+
+st.form_submit_button() 
