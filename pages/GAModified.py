@@ -151,9 +151,9 @@ CO_R = st.slider(
 # Mutation Rate (MUT_R) input from the user
 MUT_R = st.slider(
     "Mutation Rate (MUT_R)",
-    min_value=0.01,
-    max_value=0.05,
-    value=0.2,
+    min_value=0.010,
+    max_value=0.050,
+    value=0.20,
     step=0.01,
     help="Set the probability of mutation during genetic operations."
 )
