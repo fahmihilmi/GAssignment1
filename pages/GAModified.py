@@ -141,7 +141,7 @@ st.title("Genetic Algorithm Parameter Tuning")
 # Crossover Rate (CO_R) input from the user
 CO_R = st.slider(
     "Crossover Rate (CO_R)",
-    min_value=0.0,
+    min_value=0.01,
     max_value=0.95,
     value=0.8,
     step=0.01,
