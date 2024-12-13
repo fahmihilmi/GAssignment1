@@ -170,12 +170,18 @@ final_schedule = initial_best_schedule + genetic_schedule[:rem_t_slots]
 
 # Prepare the data for the table
 schedule_data = {
-    "Time Slot": [f"{hour}:00" for hour in all_time_slots],
-    "Program": final_schedule
+    "Time Slot": [f"Hour {hour}" for hour in all_time_slots],
 }
+
+# Add the programs to the dictionary dynamically for each time slot
+for idx, program in enumerate(final_schedule):
+    schedule_data[f"Program {idx + 1}"] = [program] * len(all_time_slots)
 
 # Convert the schedule data to a Pandas DataFrame for table display
 schedule_df = pd.DataFrame(schedule_data)
+
+# Transpose the DataFrame to make time slots horizontal
+schedule_df = schedule_df.transpose()
 
 # Display the resulting schedule in table format
 st.write("### Final Optimal Schedule:")
