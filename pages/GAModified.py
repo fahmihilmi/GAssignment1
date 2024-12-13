@@ -169,23 +169,14 @@ genetic_schedule = genetic_algorithm(
 final_schedule = initial_best_schedule + genetic_schedule[:rem_t_slots]
 
 # Prepare the data for the table
-schedule_data = {
-    "Time Slot": [f"Hour {hour}" for hour in all_time_slots],
-}
-
-# Add the programs to the dictionary dynamically for each time slot
-for idx, program in enumerate(final_schedule):
-    schedule_data[f"Program {idx + 1}"] = [program] * len(all_time_slots)
+schedule_data = {f"Hour {hour}": [program] for hour, program in zip(all_time_slots, final_schedule)}
 
 # Convert the schedule data to a Pandas DataFrame for table display
 schedule_df = pd.DataFrame(schedule_data)
 
-# Transpose the DataFrame to make time slots horizontal
-schedule_df = schedule_df.transpose()
-
-# Display the resulting schedule in table format
+# Display the resulting schedule in horizontal table format
 st.write("### Final Optimal Schedule:")
-st.dataframe(schedule_df)  # Display the schedule in a DataFrame
+st.dataframe(schedule_df.transpose())  # Transpose to display hours horizontally
 
 # Display the total ratings
 st.write("### Total Ratings:", fitness_function(final_schedule))
